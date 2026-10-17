@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- viewport-fit=cover lets the page use the full iPhone screen; the CSS then keeps content clear of the notch and home bar -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#ffe6ee">
+    <meta name="color-scheme" content="only light">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="format-detection" content="telephone=no">
+
+    <title>A Birthday Surprise 🎂</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="phone-shell" id="shell" aria-label="Birthday surprise">
+
+        <div class="deco" id="deco" aria-hidden="true"></div>
+
+        <!-- Fake phone chrome: only shown on desktop, hidden on real phones -->
+        <div class="notch" aria-hidden="true"></div>
+        <div class="status-bar" aria-hidden="true">
+            <span>9:41</span>
+            <span class="battery"></span>
+        </div>
+
+        <div class="phone-screen">
+
+            <!-- 1. WELCOME -->
+            <section class="screen active" id="welcome">
+                <div class="card">
+
+                    <svg class="ecg" viewBox="0 0 320 80" aria-hidden="true" focusable="false">
+                        <path class="ecg-line" pathLength="1"
+                              d="M0,40 H50 L58,32 L66,40 H86 L94,44 L104,6 L114,70 L122,40 H150 Q162,22 174,40 H210 L218,32 L226,40 H246 L254,44 L264,6 L274,70 L282,40 H320"/>
+                    </svg>
+
+                    <h1 tabindex="-1">Happy Birthday,<br><span>Crystel</span>!</h1>
+
+                    <p class="lede">Your birthday checkup is ready.</p>
+
+                    <button class="gift" type="button" data-go="vitals" data-confetti="90"
+                            aria-hidden="true" tabindex="-1">🎁</button>
+
+                    <button class="btn" type="button" data-go="vitals" data-confetti="90">
+                        Open your gift ✨
+                    </button>
+
+                </div>
+            </section>
+
+            <!-- 2. VITALS -->
+            <section class="screen" id="vitals" aria-hidden="true">
+                <div class="card">
+
+                    <h2 tabindex="-1">Birthday checkup 🩺</h2>
+                    <p class="lede">Tap each one to run your vitals.</p>
+
+                    <div class="vitals">
+
+                        <button class="vital vital--pink" type="button" aria-pressed="false"
+                                data-from="0" data-to="100" data-note="Overflowing with love">
+                            <span class="vital-icon" aria-hidden="true">💗</span>
+                            <span class="vital-text">
+                                <span class="vital-title">Heart</span>
+                                <span class="vital-note">Tap to check</span>
+                            </span>
+                            <span class="vital-reading">–</span>
+                        </button>
+
+                        <button class="vital vital--mint" type="button" aria-pressed="false"
+                                data-from="0" data-to="100" data-note="Off the charts">
+                            <span class="vital-icon" aria-hidden="true">🌸</span>
+                            <span class="vital-text">
+                                <span class="vital-title">Kindness</span>
+                                <span class="vital-note">Tap to check</span>
+                            </span>
+                            <span class="vital-reading">–</span>
+                        </button>
+
+                        <button class="vital vital--sky" type="button" aria-pressed="false"
+                                data-from="100" data-to="0" data-note="Cleared for today only">
+                            <span class="vital-icon" aria-hidden="true">☁️</span>
+                            <span class="vital-text">
+                                <span class="vital-title">Stress</span>
+                                <span class="vital-note">Tap to check</span>
+                            </span>
+                            <span class="vital-reading">–</span>
+                        </button>
+
+                    </div>
+
+                    <button class="btn" type="button" id="vitalsNext" data-go="note" disabled>
+                        Check all three to continue (0/3)
+                    </button>
+
+                </div>
+            </section>
+
+            <!-- 3. NOTE -->
+            <section class="screen" id="note" aria-hidden="true">
+                <div class="clipboard">
+                    <span class="clip" aria-hidden="true"></span>
+
+                    <h2 tabindex="-1">A note for <span>you</span></h2>
+
+                    <p id="typewriter" role="note"></p>
+
+                    <button class="btn" type="button" data-go="wish">
+                        Next: make a wish 🎂
+                    </button>
+                </div>
+            </section>
+
+            <!-- 4. WISH -->
+            <section class="screen" id="wish" aria-hidden="true">
+                <div class="card">
+
+                    <div class="cake-scene" id="cakeScene">
+                        <button class="candle-btn" type="button" id="candle" aria-label="Blow out the candle">
+                            <span class="flame"></span>
+                            <span class="smoke"></span>
+                            <span class="smoke"></span>
+                            <span class="smoke"></span>
+                            <span class="wick"></span>
+                            <span class="candle"></span>
+                        </button>
+
+                        <div class="cake" aria-hidden="true">
+                            <div class="tier tier--top"></div>
+                            <div class="tier tier--bottom"></div>
+                        </div>
+                        <div class="plate" aria-hidden="true"></div>
+                    </div>
+
+                    <div class="wish-copy">
+                        <h2 id="wishTitle" tabindex="-1">Make a wish</h2>
+                        <p class="hand" id="wishHint" aria-live="polite">Tap the candle to blow it out.</p>
+                    </div>
+
+                    <button class="btn is-hidden" type="button" id="restartButton">
+                        Replay surprise ↻
+                    </button>
+
+                </div>
+            </section>
+
+        </div>
+
+        <div class="dots" id="dots" aria-hidden="true">
+            <span class="on"></span><span></span><span></span><span></span>
+        </div>
+
+        <div class="confetti-layer" id="confetti" aria-hidden="true"></div>
+
+    </main>
+
+    <script src="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,833 @@
+/* =========================================================
+   TOKENS
+   Palette: blush pink + scrub teal + butter yellow, plum ink
+========================================================= */
+
+:root {
+    --pink: #ff7fa8;
+    --pink-soft: #ffd3e2;
+    --rose: #d6487f;
+    --rose-deep: #b93068;
+    --teal: #4fc1b8;
+    --teal-deep: #2c8d86;
+    --mint: #d6f4ef;
+    --sky: #cfeafb;
+    --butter: #fff0b3;
+
+    --ink: #4b2341;
+    --ink-soft: #7a5069;
+    --paper: #fffdfb;
+
+    --r-lg: 28px;
+    --r-md: 20px;
+    --r-sm: 14px;
+
+    --font-ui: "Fredoka", ui-rounded, "SF Pro Rounded", "Avenir Next Rounded", system-ui, sans-serif;
+    --font-hand: "Caveat", "Bradley Hand", "Noteworthy", "Segoe Print", cursive;
+
+    --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cpath d='M14 9v10M9 14h10' stroke='%23FF7FA8' stroke-opacity='.28' stroke-width='2.6' stroke-linecap='round'/%3E%3Ccircle cx='42' cy='42' r='2.4' fill='%234FC1B8' fill-opacity='.3'/%3E%3C/svg%3E");
+    --gradient: linear-gradient(165deg, #ffe9f0 0%, #ffd6e5 50%, #d9f4ef 100%);
+}
+
+
+/* =========================================================
+   RESET + PAGE
+========================================================= */
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    /* fixed + inset 0 keeps iOS Safari from rubber-banding the page */
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+
+    display: grid;
+    place-items: center;
+
+    font-family: var(--font-ui);
+    color: var(--ink);
+    background: var(--pattern), var(--gradient);
+
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+[tabindex="-1"]:focus {
+    outline: none;
+}
+
+:is(.btn, .vital, .candle-btn, .gift):focus-visible {
+    outline: 3px solid var(--teal-deep);
+    outline-offset: 3px;
+}
+
+
+/* =========================================================
+   PHONE SHELL
+   Real phones: fills the whole screen, respects the notch.
+   Desktop with a mouse: shows a phone frame.
+========================================================= */
+
+.phone-shell {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--pattern), var(--gradient);
+}
+
+.status-bar,
+.notch {
+    display: none;
+}
+
+.phone-screen {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+}
+
+.deco,
+.confetti-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.deco {
+    z-index: 0;
+}
+
+.confetti-layer {
+    z-index: 30;
+}
+
+@media (min-width: 640px) and (min-height: 700px) and (hover: hover) and (pointer: fine) {
+
+    .phone-shell {
+        width: min(390px, 92vw);
+        height: min(844px, 92vh);
+        border: 10px solid #1d1322;
+        border-radius: 46px;
+        box-shadow: 0 30px 70px -10px rgba(110, 40, 80, 0.45);
+    }
+
+    .notch {
+        display: block;
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 104px;
+        height: 28px;
+        border-radius: 20px;
+        background: #1d1322;
+        z-index: 40;
+    }
+
+    .status-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex: none;
+        height: 46px;
+        padding: 10px 26px 0;
+        font-size: 14px;
+        font-weight: 600;
+        position: relative;
+        z-index: 2;
+    }
+
+    .battery {
+        position: relative;
+        width: 24px;
+        height: 12px;
+        border: 1.5px solid var(--ink);
+        border-radius: 4px;
+    }
+
+    .battery::before {
+        content: "";
+        position: absolute;
+        inset: 1.5px;
+        border-radius: 2px;
+        background: var(--ink);
+    }
+}
+
+
+/* =========================================================
+   SCREENS
+========================================================= */
+
+.screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+
+    /* safe-area-inset-* = iPhone notch, Dynamic Island and home bar */
+    padding:
+        calc(env(safe-area-inset-top, 0px) + 18px)
+        calc(env(safe-area-inset-right, 0px) + 16px)
+        calc(env(safe-area-inset-bottom, 0px) + 60px)
+        calc(env(safe-area-inset-left, 0px) + 16px);
+
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(24px);
+    transition:
+        opacity 0.5s ease,
+        transform 0.5s ease,
+        visibility 0s linear 0.5s;
+    z-index: 1;
+}
+
+.screen.active {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition-delay: 0s;
+    z-index: 2;
+}
+
+/* margin:auto centers when short and scrolls cleanly when tall */
+.screen > * {
+    margin: auto;
+}
+
+
+/* =========================================================
+   CONTAINERS
+========================================================= */
+
+.card,
+.clipboard {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+}
+
+.card {
+    padding: 30px 22px 28px;
+    background: rgba(255, 253, 251, 0.94);
+    border-radius: var(--r-lg);
+    box-shadow:
+        0 18px 40px -14px rgba(120, 40, 80, 0.3),
+        0 0 0 2px rgba(255, 255, 255, 0.9) inset;
+}
+
+/* Clipboard: teal board, metal clip, ruled paper */
+.clipboard {
+    padding: 44px 20px 24px;
+    background: var(--paper);
+    border: 8px solid var(--teal);
+    border-radius: 26px;
+    box-shadow: 0 18px 40px -14px rgba(30, 90, 85, 0.4);
+}
+
+.clip {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    width: 92px;
+    height: 30px;
+    transform: translateX(-50%);
+    border-radius: 9px 9px 12px 12px;
+    background: linear-gradient(#b4bfc7, #8b98a2);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.18);
+}
+
+.clip::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    width: 36px;
+    height: 10px;
+    transform: translateX(-50%);
+    border-radius: 6px;
+    background: var(--teal);
+}
+
+/* =========================================================
+   TYPE
+========================================================= */
+
+h1 {
+    font-size: clamp(1.9rem, 8.6vw, 2.2rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    overflow-wrap: break-word;
+}
+
+h2 {
+    font-size: clamp(1.4rem, 6.6vw, 1.6rem);
+    font-weight: 600;
+    line-height: 1.2;
+    overflow-wrap: break-word;
+}
+
+p {
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+}
+
+.lede {
+    margin-top: 10px;
+}
+
+.hand {
+    font-family: var(--font-hand);
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.btn {
+    display: inline-block;
+    width: 100%;
+    max-width: 320px;
+    margin-top: 22px;
+    padding: 15px 22px;
+
+    border: 0;
+    border-radius: 999px;
+
+    font: 600 1.0625rem/1.25 var(--font-ui);
+    color: #fff;
+    background: linear-gradient(135deg, #de4f86, #c23a70);
+    box-shadow: 0 10px 22px -6px rgba(194, 58, 112, 0.55);
+
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.4s ease,
+        visibility 0.4s ease;
+}
+
+.btn:active:not(:disabled) {
+    transform: scale(0.96);
+}
+
+.btn:disabled {
+    cursor: not-allowed;
+    color: #8f6c7d;
+    background: #ecd5de;
+    box-shadow: none;
+}
+
+.btn.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+@media (hover: hover) {
+    .btn:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 26px -6px rgba(194, 58, 112, 0.6);
+    }
+}
+
+
+/* =========================================================
+   WELCOME
+========================================================= */
+
+.ecg {
+    display: block;
+    width: 100%;
+    height: 64px;
+    margin-bottom: 14px;
+}
+
+.ecg-line {
+    fill: none;
+    stroke: var(--rose);
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: ecgDraw 3.4s linear infinite;
+}
+
+.gift {
+    display: block;
+    margin: 18px auto 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 88px;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    filter: drop-shadow(0 12px 10px rgba(110, 40, 80, 0.2));
+    animation: giftWiggle 1.4s ease-in-out infinite alternate;
+}
+
+
+/* =========================================================
+   VITALS
+========================================================= */
+
+.vitals {
+    display: grid;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.vital {
+    --tile: var(--pink-soft);
+
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 16px;
+
+    border: 0;
+    border-radius: var(--r-md);
+    background: var(--tile);
+
+    font: inherit;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: transform 0.2s ease;
+}
+
+.vital--pink { --tile: var(--pink-soft); }
+.vital--mint { --tile: var(--mint); }
+.vital--sky  { --tile: var(--sky); }
+
+.vital:active {
+    transform: scale(0.97);
+}
+
+.vital-icon {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #fff;
+    font-size: 26px;
+}
+
+.vital-text {
+    display: grid;
+    gap: 2px;
+}
+
+.vital-title {
+    font-weight: 600;
+    font-size: 1.05rem;
+}
+
+.vital-note {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+}
+
+.vital-reading {
+    min-width: 3.4ch;
+    text-align: right;
+    font-weight: 600;
+    font-size: 1.6rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-soft);
+}
+
+.vital.checked .vital-reading {
+    color: var(--rose-deep);
+}
+
+.vital.checked .vital-icon {
+    animation: pop 0.45s ease;
+}
+
+
+/* =========================================================
+   NOTE (clipboard + handwriting)
+========================================================= */
+
+#typewriter {
+    margin-top: 6px;
+    min-height: 68px;
+    padding-top: 2px;
+
+    font-family: var(--font-hand);
+    font-size: 1.4rem;
+    font-weight: 500;
+    line-height: 34px;
+    text-align: left;
+    white-space: pre-wrap;
+    color: var(--ink);
+
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0 33px,
+        rgba(79, 193, 184, 0.32) 33px 34px
+    );
+    background-attachment: local;
+}
+
+.ch {
+    opacity: 0;
+}
+
+.ch.on {
+    opacity: 1;
+}
+
+
+/* =========================================================
+   WISH (cake + candle)
+========================================================= */
+
+.cake-scene {
+    position: relative;
+    margin-top: 22px;
+}
+
+.candle-btn {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: 64px;
+    height: 100px;
+    margin: 0 auto -6px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.candle {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 14px;
+    height: 54px;
+    transform: translateX(-50%);
+    border-radius: 5px 5px 2px 2px;
+    background: repeating-linear-gradient(
+        -45deg,
+        #fff 0 7px,
+        var(--pink) 7px 14px
+    );
+}
+
+.wick {
+    position: absolute;
+    left: 50%;
+    bottom: 54px;
+    width: 2px;
+    height: 8px;
+    transform: translateX(-50%);
+    background: #5a3a4b;
+}
+
+.flame {
+    position: absolute;
+    left: 50%;
+    bottom: 60px;
+    width: 18px;
+    height: 28px;
+    margin-left: -9px;
+    border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+    background: radial-gradient(circle at 50% 70%, #fff7d1 0%, #ffd166 45%, #ff9f43 100%);
+    box-shadow: 0 0 18px 6px rgba(255, 208, 102, 0.55);
+    transform-origin: 50% 100%;
+    animation: flicker 0.18s ease-in-out infinite alternate;
+    transition: opacity 0.3s ease;
+}
+
+.smoke {
+    position: absolute;
+    left: 50%;
+    bottom: 64px;
+    width: 12px;
+    height: 12px;
+    margin-left: -6px;
+    border-radius: 50%;
+    background: rgba(120, 90, 110, 0.35);
+    opacity: 0;
+}
+
+.cake-scene.blown .flame {
+    opacity: 0;
+    animation: none;
+}
+
+.cake-scene.blown .smoke {
+    animation: smoke 1.8s ease-out forwards;
+}
+
+.cake-scene.blown .smoke:nth-of-type(2) { animation-delay: 0.25s; }
+.cake-scene.blown .smoke:nth-of-type(3) { animation-delay: 0.5s; }
+
+.cake {
+    position: relative;
+    z-index: 1;
+    width: 220px;
+    margin: 0 auto;
+    filter: drop-shadow(0 8px 8px rgba(120, 40, 80, 0.18));
+}
+
+.tier {
+    position: relative;
+    margin: 0 auto;
+    border-radius: 16px 16px 6px 6px;
+}
+
+.tier::before,
+.tier::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+/* white frosting cap + scalloped drips */
+.tier::before {
+    top: 0;
+    height: 14px;
+    border-radius: 16px 16px 0 0;
+    background: #fff;
+}
+
+.tier::after {
+    top: 13px;
+    height: 12px;
+    background: radial-gradient(circle at 10px 0, #fff 9.5px, transparent 10.5px) 0 0 / 20px 100% repeat-x;
+}
+
+.tier--top {
+    width: 140px;
+    height: 62px;
+    background: #ff9dbb;
+}
+
+.tier--bottom {
+    width: 220px;
+    height: 78px;
+    margin-top: -2px;
+    background-color: var(--teal);
+    background-image:
+        radial-gradient(circle at 18% 66%, #fff 2.6px, transparent 3.2px),
+        radial-gradient(circle at 52% 74%, var(--butter) 2.6px, transparent 3.2px),
+        radial-gradient(circle at 80% 62%, #ff9dbb 2.6px, transparent 3.2px),
+        radial-gradient(circle at 36% 86%, #ff9dbb 2.6px, transparent 3.2px),
+        radial-gradient(circle at 70% 88%, #fff 2.6px, transparent 3.2px),
+        radial-gradient(circle at 90% 82%, var(--butter) 2.6px, transparent 3.2px);
+}
+
+.plate {
+    width: 256px;
+    height: 14px;
+    margin: -2px auto 0;
+    border-radius: 50% / 60%;
+    background: #fff;
+    box-shadow: 0 6px 12px rgba(120, 40, 80, 0.16);
+}
+
+.wish-copy {
+    margin-top: 22px;
+}
+
+.wish-copy .hand {
+    margin-top: 8px;
+    font-size: 1.45rem;
+    line-height: 1.25;
+    color: var(--ink-soft);
+}
+
+
+/* =========================================================
+   PROGRESS DOTS
+========================================================= */
+
+.dots {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(214, 72, 127, 0.28);
+    transition: width 0.3s ease, background 0.3s ease;
+}
+
+.dots span.on {
+    width: 24px;
+    background: var(--rose);
+}
+
+
+/* =========================================================
+   CONFETTI + FLOATING DECORATIONS
+========================================================= */
+
+.confetti {
+    position: absolute;
+    top: -24px;
+    will-change: transform;
+    animation: confettiFall linear forwards;
+}
+
+.floaty {
+    position: absolute;
+    bottom: -40px;
+    user-select: none;
+    -webkit-user-select: none;
+    animation: floatUp linear forwards;
+}
+
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+@keyframes ecgDraw {
+    0%   { stroke-dashoffset: 1; opacity: 1; }
+    65%  { stroke-dashoffset: 0; opacity: 1; }
+    90%  { stroke-dashoffset: 0; opacity: 0; }
+    100% { stroke-dashoffset: 1; opacity: 0; }
+}
+
+@keyframes giftWiggle {
+    from { transform: translateY(0) rotate(-4deg); }
+    to   { transform: translateY(-12px) rotate(4deg); }
+}
+
+@keyframes pop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.22); }
+    100% { transform: scale(1); }
+}
+
+@keyframes flicker {
+    from { transform: scale(1, 1) rotate(-2deg); }
+    to   { transform: scale(0.94, 1.07) rotate(2deg); }
+}
+
+@keyframes smoke {
+    0%   { opacity: 0; transform: translate(0, 0) scale(0.6); }
+    20%  { opacity: 0.7; }
+    100% { opacity: 0; transform: translate(10px, -56px) scale(2.4); }
+}
+
+@keyframes confettiFall {
+    from { transform: translate3d(0, 0, 0) rotate(0deg); }
+    to   { transform: translate3d(var(--drift, 0), 120vh, 0) rotate(var(--spin, 600deg)); }
+}
+
+@keyframes floatUp {
+    0%   { opacity: 0; transform: translate3d(0, 0, 0) rotate(0deg); }
+    12%  { opacity: 1; }
+    85%  { opacity: 0.8; }
+    100% { opacity: 0; transform: translate3d(0, -115vh, 0) rotate(300deg); }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 360px) {
+
+    .card {
+        padding: 26px 16px 24px;
+    }
+
+    .clipboard {
+        padding: 42px 14px 20px;
+    }
+
+    .gift {
+        font-size: 72px;
+    }
+
+    #typewriter {
+        font-size: 1.3rem;
+    }
+}
+
+/* short screens (iPhone SE, landscape) */
+@media (max-height: 640px) {
+
+    .ecg {
+        height: 48px;
+    }
+
+    .gift {
+        font-size: 64px;
+        margin-top: 8px;
+    }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        transition-delay: 0s !important;
+    }
+
+    .ecg-line {
+        stroke-dashoffset: 0;
+    }
+}
